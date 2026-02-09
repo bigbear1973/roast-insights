@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code Roast Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #1a1a1a;
+      color: #e5e5e5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: #2a2a2a;
+    }
+
+    .chat-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #404040;
+      background: #1f1f1f;
+    }
+
+    .chat-header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .message {
+      margin-bottom: 24px;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-role {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      color: #888;
+    }
+
+    .message.user .message-role { color: #60a5fa; }
+    .message.assistant .message-role { color: #a78bfa; }
+
+    .message-content {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #e5e5e5;
+    }
+
+    .typing-indicator {
+      display: none;
+      padding: 12px 16px;
+      background: #333;
+      border-radius: 8px;
+      width: fit-content;
+    }
+
+    .typing-indicator.active {
+      display: block;
+    }
+
+    .typing-indicator span {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #666;
+      border-radius: 50%;
+      margin: 0 2px;
+      animation: bounce 1.4s infinite;
+    }
+
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-10px); }
+    }
+
+    .chat-input-container {
+      padding: 20px 24px;
+      border-top: 1px solid #404040;
+      background: #1f1f1f;
+    }
+
+    .chat-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: #2a2a2a;
+      border: 1px solid #404040;
+      border-radius: 12px;
+      padding: 12px 16px;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input-wrapper:focus-within {
+      border-color: #60a5fa;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #e5e5e5;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .chat-input::placeholder {
+      color: #666;
+    }
+
+    .send-button {
+      background: #60a5fa;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      margin-left: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    .send-button:hover:not(:disabled) {
+      background: #3b82f6;
+    }
+
+    .send-button:disabled {
+      background: #404040;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .report-link {
+      display: inline-block;
+      background: #a78bfa;
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      margin-top: 12px;
+      transition: background 0.2s;
+    }
+
+    .report-link:hover {
+      background: #8b5cf6;
+    }
+
+    .intro-message {
+      text-align: center;
+      padding: 60px 24px;
+      color: #888;
+    }
+
+    .intro-message h2 {
+      font-size: 24px;
+      color: #e5e5e5;
+      margin-bottom: 12px;
+    }
+
+    .intro-message p {
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .slash-command {
+      color: #60a5fa;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <h1>Claude Code Roast Generator</h1>
+    </div>
+
+    <div class="chat-messages" id="messages">
+      <div class="intro-message">
+        <h2>Ready to get roasted?</h2>
+        <p>Type <span class="slash-command">/insights</span> to generate a brutally honest assessment of your development skills and knowledge gaps.</p>
+        <p style="margin-top: 8px; font-size: 13px; color: #666;">Warning: May contain harsh truths about your coding habits 🔥</p>
+      </div>
+    </div>
+
+    <div class="chat-input-container">
+      <div class="chat-input-wrapper">
+        <input
+          type="text"
+          class="chat-input"
+          id="input"
+          placeholder="Type /insights..."
+          autocomplete="off"
+        >
+        <button class="send-button" id="send">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const messagesContainer = document.getElementById('messages');
+    const input = document.getElementById('input');
+    const sendButton = document.getElementById('send');
+
+    function addMessage(role, content) {
+      const intro = document.querySelector('.intro-message');
+      if (intro) intro.remove();
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${role}`;
+      messageDiv.innerHTML = `
+        <div class="message-role">${role}</div>
+        <div class="message-content">${content}</div>
+      `;
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function showTyping() {
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'typing-indicator active';
+      typingDiv.id = 'typing';
+      typingDiv.innerHTML = '<span></span><span></span><span></span>';
+      messagesContainer.appendChild(typingDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function hideTyping() {
+      const typing = document.getElementById('typing');
+      if (typing) typing.remove();
+    }
+
+    async function generateReport() {
+      showTyping();
+
+      // Simulate thinking time
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      hideTyping();
+
+      const reportUrl = window.location.href.replace('index.html', 'report.html');
+      addMessage('assistant', `
+        Your roast report is ready:<br>
+        <a href="${reportUrl}" class="report-link" target="_blank">🔥 View Your Roast Report 🔥</a><br><br>
+        Hope you're ready for some hard truths about your development methodology! 😈
+      `);
+    }
+
+    function handleSend() {
+      const message = input.value.trim();
+      if (!message) return;
+
+      if (message.toLowerCase() === '/insights') {
+        addMessage('user', message);
+        input.value = '';
+        input.disabled = true;
+        sendButton.disabled = true;
+        generateReport();
+      } else {
+        addMessage('user', message);
+        input.value = '';
+        setTimeout(() => {
+          addMessage('assistant', `I can only respond to the <span class="slash-command">/insights</span> command. Try typing that! 🔥`);
+        }, 500);
+      }
+    }
+
+    sendButton.addEventListener('click', handleSend);
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSend();
+    });
+  </script>
+</body>
+</html>
