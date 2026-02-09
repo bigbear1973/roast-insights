@@ -3,302 +3,396 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Claude Code Roast Generator</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Claude Code</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #1a1a1a;
-      color: #e5e5e5;
+      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+      background: #1e1e1e;
+      color: #cccccc;
       height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
-    .chat-container {
-      max-width: 900px;
+    .terminal-container {
       width: 100%;
-      margin: 0 auto;
+      height: 100vh;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      background: #2a2a2a;
+      background: #1e1e1e;
     }
 
-    .chat-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid #404040;
-      background: #1f1f1f;
+    .terminal-header {
+      padding: 20px 32px;
+      border-bottom: 1px solid #333;
+      background: #1e1e1e;
     }
 
-    .chat-header h1 {
-      font-size: 18px;
-      font-weight: 600;
-      color: #fff;
+    .header-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
     }
 
-    .chat-messages {
+    .robot-logo {
+      width: 48px;
+      height: 48px;
+      background: #ff6b35;
+      border-radius: 4px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .robot-logo::before {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #1e1e1e;
+      border-radius: 2px;
+      top: 14px;
+      left: 10px;
+    }
+
+    .robot-logo::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #1e1e1e;
+      border-radius: 2px;
+      top: 14px;
+      right: 10px;
+    }
+
+    .robot-mouth {
+      position: absolute;
+      bottom: 10px;
+      left: 12px;
+      right: 12px;
+      height: 4px;
+      background: #1e1e1e;
+      border-radius: 2px;
+    }
+
+    .header-text {
+      flex: 1;
+    }
+
+    .version-line {
+      font-size: 15px;
+      color: #cccccc;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .version-number {
+      color: #888;
+      font-weight: 400;
+    }
+
+    .meta-line {
+      font-size: 13px;
+      color: #888;
+      line-height: 1.4;
+    }
+
+    .terminal-content {
       flex: 1;
       overflow-y: auto;
-      padding: 24px;
-    }
-
-    .message {
-      margin-bottom: 24px;
-      animation: fadeIn 0.3s ease-in;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .message-role {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-      color: #888;
-    }
-
-    .message.user .message-role { color: #60a5fa; }
-    .message.assistant .message-role { color: #a78bfa; }
-
-    .message-content {
-      font-size: 15px;
+      padding: 24px 32px;
+      font-size: 13px;
       line-height: 1.6;
-      color: #e5e5e5;
     }
 
-    .typing-indicator {
-      display: none;
-      padding: 12px 16px;
-      background: #333;
-      border-radius: 8px;
-      width: fit-content;
+    .welcome-text {
+      color: #888;
+      margin-bottom: 32px;
     }
 
-    .typing-indicator.active {
-      display: block;
+    .prompt-line {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      gap: 8px;
     }
 
-    .typing-indicator span {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      background: #666;
-      border-radius: 50%;
-      margin: 0 2px;
-      animation: bounce 1.4s infinite;
+    .prompt-symbol {
+      color: #cccccc;
+      user-select: none;
     }
 
-    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes bounce {
-      0%, 60%, 100% { transform: translateY(0); }
-      30% { transform: translateY(-10px); }
+    .prompt-icon {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
     }
 
-    .chat-input-container {
-      padding: 20px 24px;
-      border-top: 1px solid #404040;
-      background: #1f1f1f;
+    .prompt-content {
+      flex: 1;
+      color: #cccccc;
     }
 
-    .chat-input-wrapper {
-      position: relative;
+    .command-hint {
+      color: #6a9955;
+      font-style: italic;
+      margin-top: 16px;
+      padding-left: 24px;
+    }
+
+    .terminal-input-area {
+      border-top: 1px solid #333;
+      background: #1e1e1e;
+      padding: 16px 32px;
+    }
+
+    .input-line {
       display: flex;
       align-items: center;
-      background: #2a2a2a;
-      border: 1px solid #404040;
-      border-radius: 12px;
-      padding: 12px 16px;
-      transition: border-color 0.2s;
+      gap: 8px;
     }
 
-    .chat-input-wrapper:focus-within {
-      border-color: #60a5fa;
+    .input-prompt {
+      color: #cccccc;
+      user-select: none;
+      font-size: 13px;
     }
 
-    .chat-input {
+    .input-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .terminal-input {
       flex: 1;
       background: transparent;
       border: none;
       outline: none;
-      color: #e5e5e5;
-      font-size: 15px;
-      font-family: 'Inter', sans-serif;
+      color: #cccccc;
+      font-size: 13px;
+      font-family: inherit;
+      padding: 4px 0;
     }
 
-    .chat-input::placeholder {
-      color: #666;
+    .terminal-input::placeholder {
+      color: #4a4a4a;
     }
 
-    .send-button {
-      background: #60a5fa;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 16px;
-      margin-left: 12px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-      transition: background 0.2s;
-    }
-
-    .send-button:hover:not(:disabled) {
-      background: #3b82f6;
-    }
-
-    .send-button:disabled {
-      background: #404040;
-      cursor: not-allowed;
-      opacity: 0.5;
+    .output-text {
+      color: #888;
+      margin: 16px 0;
+      padding-left: 24px;
     }
 
     .report-link {
-      display: inline-block;
-      background: #a78bfa;
-      color: white;
+      color: #4ec9b0;
       text-decoration: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: 600;
-      margin-top: 12px;
-      transition: background 0.2s;
+      cursor: pointer;
     }
 
     .report-link:hover {
-      background: #8b5cf6;
+      text-decoration: underline;
     }
 
-    .intro-message {
-      text-align: center;
-      padding: 60px 24px;
-      color: #888;
+    .blinking-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 16px;
+      background: #cccccc;
+      margin-left: 2px;
+      animation: blink 1s step-end infinite;
+      vertical-align: text-bottom;
     }
 
-    .intro-message h2 {
-      font-size: 24px;
-      color: #e5e5e5;
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    .intro-section {
+      margin-top: 32px;
+      padding-left: 24px;
+    }
+
+    .intro-heading {
+      color: #cccccc;
+      font-size: 15px;
       margin-bottom: 12px;
     }
 
-    .intro-message p {
-      font-size: 15px;
+    .intro-text {
+      color: #888;
       line-height: 1.6;
+      margin-bottom: 8px;
     }
 
-    .slash-command {
-      color: #60a5fa;
-      font-weight: 600;
+    .warning-text {
+      color: #ce9178;
+      margin-top: 16px;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 14px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #1e1e1e;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #424242;
+      border: 3px solid #1e1e1e;
+      border-radius: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4e4e4e;
     }
   </style>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="chat-header">
-      <h1>Claude Code Roast Generator</h1>
-    </div>
-
-    <div class="chat-messages" id="messages">
-      <div class="intro-message">
-        <h2>Ready to get roasted?</h2>
-        <p>Type <span class="slash-command">/insights</span> to generate a brutally honest assessment of your development skills and knowledge gaps.</p>
-        <p style="margin-top: 8px; font-size: 13px; color: #666;">Warning: May contain harsh truths about your coding habits 🔥</p>
+  <div class="terminal-container">
+    <div class="terminal-header">
+      <div class="header-content">
+        <div class="robot-logo">
+          <div class="robot-mouth"></div>
+        </div>
+        <div class="header-text">
+          <div class="version-line">
+            Claude Code <span class="version-number">v2.1.34</span>
+          </div>
+          <div class="meta-line">Opus 4.6 · Claude Team</div>
+          <div class="meta-line">/Users/rogerbyrne</div>
+        </div>
       </div>
     </div>
 
-    <div class="chat-input-container">
-      <div class="chat-input-wrapper">
+    <div class="terminal-content" id="terminal-content">
+      <div class="welcome-text">Welcome to Opus 4.6</div>
+
+      <div class="intro-section" id="intro-section">
+        <div class="intro-heading">Ready to get roasted? 🔥</div>
+        <div class="intro-text">
+          Type <span style="color: #4ec9b0;">/insights</span> to generate a brutally honest assessment
+        </div>
+        <div class="intro-text">
+          of your development skills and knowledge gaps.
+        </div>
+        <div class="warning-text">
+          Warning: May contain harsh truths about your coding habits
+        </div>
+      </div>
+
+      <div class="command-hint">ctrl+t to hide tasks</div>
+    </div>
+
+    <div class="terminal-input-area">
+      <div class="input-line">
+        <span class="input-prompt">&gt;</span>
+        <svg class="input-icon" viewBox="0 0 16 16" fill="none">
+          <rect width="16" height="16" rx="2" fill="#FF6B35"/>
+          <rect x="4" y="5" width="3" height="3" rx="1" fill="#1E1E1E"/>
+          <rect x="9" y="5" width="3" height="3" rx="1" fill="#1E1E1E"/>
+          <rect x="4" y="10" width="8" height="2" rx="1" fill="#1E1E1E"/>
+        </svg>
         <input
           type="text"
-          class="chat-input"
-          id="input"
-          placeholder="Type /insights..."
+          class="terminal-input"
+          id="terminal-input"
+          placeholder="try &quot;fix typecheck errors&quot;"
           autocomplete="off"
-        >
-        <button class="send-button" id="send">Send</button>
+          spellcheck="false"
+        />
       </div>
     </div>
   </div>
 
   <script>
-    const messagesContainer = document.getElementById('messages');
-    const input = document.getElementById('input');
-    const sendButton = document.getElementById('send');
+    const terminalContent = document.getElementById('terminal-content');
+    const terminalInput = document.getElementById('terminal-input');
+    const introSection = document.getElementById('intro-section');
 
-    function addMessage(role, content) {
-      const intro = document.querySelector('.intro-message');
-      if (intro) intro.remove();
+    let commandExecuted = false;
 
-      const messageDiv = document.createElement('div');
-      messageDiv.className = `message ${role}`;
-      messageDiv.innerHTML = `
-        <div class="message-role">${role}</div>
-        <div class="message-content">${content}</div>
-      `;
-      messagesContainer.appendChild(messageDiv);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    function showTyping() {
-      const typingDiv = document.createElement('div');
-      typingDiv.className = 'typing-indicator active';
-      typingDiv.id = 'typing';
-      typingDiv.innerHTML = '<span></span><span></span><span></span>';
-      messagesContainer.appendChild(typingDiv);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    function hideTyping() {
-      const typing = document.getElementById('typing');
-      if (typing) typing.remove();
-    }
-
-    async function generateReport() {
-      showTyping();
-
-      // Simulate thinking time
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      hideTyping();
-
-      const reportUrl = window.location.href.replace('index.html', 'report.html');
-      addMessage('assistant', `
-        Your roast report is ready:<br>
-        <a href="${reportUrl}" class="report-link" target="_blank">🔥 View Your Roast Report 🔥</a><br><br>
-        Hope you're ready for some hard truths about your development methodology! 😈
-      `);
-    }
-
-    function handleSend() {
-      const message = input.value.trim();
-      if (!message) return;
-
-      if (message.toLowerCase() === '/insights') {
-        addMessage('user', message);
-        input.value = '';
-        input.disabled = true;
-        sendButton.disabled = true;
-        generateReport();
-      } else {
-        addMessage('user', message);
-        input.value = '';
-        setTimeout(() => {
-          addMessage('assistant', `I can only respond to the <span class="slash-command">/insights</span> command. Try typing that! 🔥`);
-        }, 500);
+    function addPromptLine(content, isUser = true) {
+      if (introSection && isUser) {
+        introSection.style.display = 'none';
       }
+
+      const promptLine = document.createElement('div');
+      promptLine.className = 'prompt-line';
+
+      const icon = isUser ?
+        `<svg class="prompt-icon" viewBox="0 0 16 16" fill="none">
+          <rect width="16" height="16" rx="2" fill="#FF6B35"/>
+          <rect x="4" y="5" width="3" height="3" rx="1" fill="#1E1E1E"/>
+          <rect x="9" y="5" width="3" height="3" rx="1" fill="#1E1E1E"/>
+          <rect x="4" y="10" width="8" height="2" rx="1" fill="#1E1E1E"/>
+        </svg>` : '';
+
+      promptLine.innerHTML = `
+        <span class="prompt-symbol">&gt;</span>
+        ${icon}
+        <div class="prompt-content">${content}</div>
+      `;
+
+      terminalContent.appendChild(promptLine);
+      terminalContent.scrollTop = terminalContent.scrollHeight;
     }
 
-    sendButton.addEventListener('click', handleSend);
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') handleSend();
+    function addOutput(content) {
+      const output = document.createElement('div');
+      output.className = 'output-text';
+      output.innerHTML = content;
+      terminalContent.appendChild(output);
+      terminalContent.scrollTop = terminalContent.scrollHeight;
+    }
+
+    async function handleCommand(command) {
+      if (command.toLowerCase().trim() === '/insights') {
+        commandExecuted = true;
+        addPromptLine(command, true);
+        terminalInput.disabled = true;
+        terminalInput.style.opacity = '0.5';
+
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        const reportUrl = window.location.href.replace('index.html', 'report.html').replace(/\/$/, '') + '/report.html';
+        addOutput(`
+          Your roast report is ready:<br><br>
+          <a href="report.html" class="report-link">🔥 View Your Roast Report 🔥</a><br><br>
+          Hope you're ready for some hard truths about your development methodology! 😈
+        `);
+      } else if (command.trim()) {
+        addPromptLine(command, true);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        addOutput(`I can only respond to the <span style="color: #4ec9b0;">/insights</span> command. Try typing that! 🔥`);
+      }
+
+      terminalInput.value = '';
+    }
+
+    terminalInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const command = terminalInput.value;
+        if (command) {
+          handleCommand(command);
+        }
+      }
+    });
+
+    // Auto-focus input
+    terminalInput.focus();
+
+    // Keep focus on input
+    document.addEventListener('click', () => {
+      if (!commandExecuted) {
+        terminalInput.focus();
+      }
     });
   </script>
 </body>
