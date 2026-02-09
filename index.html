@@ -277,13 +277,16 @@
       <div class="intro-section" id="intro-section">
         <div class="intro-heading">Ready to get roasted? 🔥</div>
         <div class="intro-text">
-          Type <span style="color: #4ec9b0;">/insights</span> to generate a brutally honest assessment
+          Type <span style="color: #4ec9b0;">/insights &lt;github-username&gt;</span> to generate a brutally honest
         </div>
         <div class="intro-text">
-          of your development skills and knowledge gaps.
+          assessment based on your actual GitHub profile and code.
+        </div>
+        <div class="intro-text" style="margin-top: 12px;">
+          Example: <span style="color: #ce9178;">/insights torvalds</span>
         </div>
         <div class="warning-text">
-          Warning: May contain harsh truths about your coding habits
+          Warning: AI-powered roasts based on your real repos and commits 🔥
         </div>
       </div>
 
@@ -353,24 +356,59 @@
     }
 
     async function handleCommand(command) {
-      if (command.toLowerCase().trim() === '/insights') {
+      const match = command.trim().match(/^\/insights\s+(.+)$/i);
+
+      if (match) {
+        const username = match[1].trim();
         commandExecuted = true;
         addPromptLine(command, true);
         terminalInput.disabled = true;
         terminalInput.style.opacity = '0.5';
 
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        addOutput(`Analyzing GitHub profile: <span style="color: #4ec9b0;">${username}</span>...`);
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-        const reportUrl = window.location.href.replace('index.html', 'report.html').replace(/\/$/, '') + '/report.html';
-        addOutput(`
-          Your roast report is ready:<br><br>
-          <a href="report.html" class="report-link">🔥 View Your Roast Report 🔥</a><br><br>
-          Hope you're ready for some hard truths about your development methodology! 😈
-        `);
+        try {
+          // Fetch GitHub data and generate roast
+          const response = await fetch('/api/generate-roast', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username })
+          });
+
+          if (!response.ok) {
+            throw new Error(await response.text());
+          }
+
+          const data = await response.json();
+
+          addOutput(`✓ Found ${data.stats.publicRepos} repos, ${data.stats.followers} followers`);
+          addOutput(`✓ Primary language: ${data.stats.topLanguage || 'Unknown'}`);
+          addOutput(`✓ Generating personalized roast with AI...`);
+
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          // Store roast data for the report page
+          sessionStorage.setItem('roastData', JSON.stringify(data));
+
+          addOutput(`
+            Your custom roast report is ready:<br><br>
+            <a href="report.html" class="report-link">🔥 View Your Personalized Roast Report 🔥</a><br><br>
+            Hope you're ready for some AI-powered truths about your code! 😈
+          `);
+        } catch (error) {
+          addOutput(`<span style="color: #f48771;">Error: ${error.message}</span><br><br>Try another username or check that the profile exists.`);
+          terminalInput.disabled = false;
+          terminalInput.style.opacity = '1';
+          commandExecuted = false;
+        }
+      } else if (command.trim().toLowerCase().startsWith('/insights')) {
+        addPromptLine(command, true);
+        addOutput(`Please provide a GitHub username:<br><span style="color: #ce9178;">/insights &lt;username&gt;</span>`);
       } else if (command.trim()) {
         addPromptLine(command, true);
         await new Promise(resolve => setTimeout(resolve, 500));
-        addOutput(`I can only respond to the <span style="color: #4ec9b0;">/insights</span> command. Try typing that! 🔥`);
+        addOutput(`I can only respond to the <span style="color: #4ec9b0;">/insights &lt;username&gt;</span> command. Try typing that! 🔥`);
       }
 
       terminalInput.value = '';

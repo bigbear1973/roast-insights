@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Claude Code Roast Report</title>
+  <title>🔥 Your Personalized Roast Report</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -11,30 +11,20 @@
     h1 { font-size: 32px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
     h2 { font-size: 20px; font-weight: 600; color: #0f172a; margin-top: 48px; margin-bottom: 16px; }
     .subtitle { color: #64748b; font-size: 15px; margin-bottom: 32px; }
-    .nav-toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 32px 0; padding: 16px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; }
-    .nav-toc a { font-size: 12px; color: #64748b; text-decoration: none; padding: 6px 12px; border-radius: 6px; background: #f1f5f9; transition: all 0.15s; }
-    .nav-toc a:hover { background: #e2e8f0; color: #334155; }
-    .stats-row { display: flex; gap: 24px; margin-bottom: 40px; padding: 20px 0; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; flex-wrap: wrap; }
-    .stat { text-align: center; }
-    .stat-value { font-size: 24px; font-weight: 700; color: #0f172a; }
-    .stat-label { font-size: 11px; color: #64748b; text-transform: uppercase; }
+    .loading { text-align: center; padding: 60px 24px; color: #64748b; }
+    .spinner { width: 40px; height: 40px; margin: 0 auto 16px; border: 3px solid #e2e8f0; border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
     .at-a-glance { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1px solid #f59e0b; border-radius: 12px; padding: 20px 24px; margin-bottom: 32px; }
     .glance-title { font-size: 16px; font-weight: 700; color: #92400e; margin-bottom: 16px; }
-    .glance-sections { display: flex; flex-direction: column; gap: 12px; }
-    .glance-section { font-size: 14px; color: #78350f; line-height: 1.6; }
+    .glance-section { font-size: 14px; color: #78350f; line-height: 1.6; margin-bottom: 12px; }
     .glance-section strong { color: #92400e; }
-    .see-more { color: #b45309; text-decoration: none; font-size: 13px; white-space: nowrap; }
-    .see-more:hover { text-decoration: underline; }
     .project-areas { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
     .project-area { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
     .area-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .area-name { font-weight: 600; font-size: 15px; color: #0f172a; }
     .area-count { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; }
     .area-desc { font-size: 14px; color: #475569; line-height: 1.5; }
-    .narrative { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
-    .narrative p { margin-bottom: 12px; font-size: 14px; color: #475569; line-height: 1.7; }
-    .key-insight { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 14px; color: #991b1b; }
-    .section-intro { font-size: 14px; color: #64748b; margin-bottom: 16px; }
+    .narrative { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 24px; font-size: 14px; color: #475569; line-height: 1.7; }
     .big-wins { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
     .big-win { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 16px; }
     .big-win-title { font-weight: 600; font-size: 15px; color: #991b1b; margin-bottom: 8px; }
@@ -44,317 +34,127 @@
     .friction-title { font-weight: 600; font-size: 15px; color: #991b1b; margin-bottom: 6px; }
     .friction-desc { font-size: 13px; color: #7f1d1d; margin-bottom: 10px; }
     .friction-examples { margin: 0 0 0 20px; font-size: 13px; color: #334155; }
-    .friction-examples li { margin-bottom: 4px; }
-    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0; }
-    .chart-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
-    .chart-title { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 12px; }
-    .bar-row { display: flex; align-items: center; margin-bottom: 6px; }
-    .bar-label { width: 120px; font-size: 11px; color: #475569; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .bar-track { flex: 1; height: 6px; background: #f1f5f9; border-radius: 3px; margin: 0 8px; }
-    .bar-fill { height: 100%; border-radius: 3px; }
-    .bar-value { width: 28px; font-size: 11px; font-weight: 500; color: #64748b; text-align: right; }
     .fun-ending { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1px solid #fbbf24; border-radius: 12px; padding: 24px; margin-top: 40px; text-align: center; }
     .fun-headline { font-size: 18px; font-weight: 600; color: #78350f; margin-bottom: 8px; }
     .fun-detail { font-size: 14px; color: #92400e; }
-    @media (max-width: 640px) { .charts-row { grid-template-columns: 1fr; } .stats-row { justify-content: center; } }
+    .back-link { display: inline-block; margin-bottom: 24px; color: #3b82f6; text-decoration: none; }
+    .back-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🔥 Claude Code Roast Report 🔥</h1>
-    <p class="subtitle">127 Stack Overflow visits · 43 "it works on my machine" incidents | Last 30 days</p>
-
-    <div class="at-a-glance">
-      <div class="glance-title">At a Glance</div>
-      <div class="glance-sections">
-        <div class="glance-section"><strong>What's "working":</strong> You've successfully turned StackOverflow into your personal technical documentation. Your ability to copy-paste code without understanding it is truly impressive. The "works on my machine" defense mechanism you've developed is chef's kiss. <a href="#section-wins" class="see-more">Your "Achievements" →</a></div>
-        <div class="glance-section"><strong>What's holding you back:</strong> Everything else. Your commit messages read like a teenager's diary entries ("fixed stuff", "ughhh", "WHY GOD WHY"). You treat semicolons like they're optional suggestions. The number of times you've shipped bugs to production that you literally just fixed locally is... concerning. <a href="#section-friction" class="see-more">The Disaster Zone →</a></div>
-        <div class="glance-section"><strong>Quick "wins":</strong> Maybe learn what git actually does instead of treating it like a magic save button? Consider reading error messages before panicking. Revolutionary idea: test your code BEFORE pushing to prod. <a href="#section-features" class="see-more">Basic Skills to Learn →</a></div>
-        <div class="glance-section"><strong>Ambitious dreams:</strong> One day you might actually understand async/await instead of just adding "await" everywhere until the red squiggles go away. Perhaps you'll discover that console.log isn't the only debugging tool. The world may never know. <a href="#section-horizon" class="see-more">Fantasy Scenarios →</a></div>
-      </div>
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <div>Loading your personalized roast...</div>
     </div>
 
-    <nav class="nav-toc">
-      <a href="#section-work">Your "Projects"</a>
-      <a href="#section-usage">How You (Mis)Use Claude</a>
-      <a href="#section-wins">Questionable Victories</a>
-      <a href="#section-friction">The Disaster Log</a>
-      <a href="#section-features">Skills You Need</a>
-      <a href="#section-patterns">Bad Habits to Break</a>
-      <a href="#section-horizon">Pipe Dreams</a>
-    </nav>
+    <div id="content" style="display: none;">
+      <a href="index.html" class="back-link">← Back to terminal</a>
+      <h1 id="title">🔥 Your Roast Report 🔥</h1>
+      <p class="subtitle" id="subtitle"></p>
 
-    <div class="stats-row">
-      <div class="stat"><div class="stat-value">427</div><div class="stat-label">"Quick Fixes"</div></div>
-      <div class="stat"><div class="stat-value">∞</div><div class="stat-label">Bugs Created</div></div>
-      <div class="stat"><div class="stat-value">73</div><div class="stat-label">TODO Comments</div></div>
-      <div class="stat"><div class="stat-value">0</div><div class="stat-label">Tests Written</div></div>
-      <div class="stat"><div class="stat-value">12</div><div class="stat-label">Prod Rollbacks</div></div>
+      <div class="at-a-glance">
+        <div class="glance-title">At a Glance</div>
+        <div id="glance-sections"></div>
+      </div>
+
+      <h2>What You Call "Work"</h2>
+      <div class="project-areas" id="projects"></div>
+
+      <h2>How You (Mis)Use GitHub</h2>
+      <div class="narrative" id="narrative"></div>
+
+      <h2>Your "Greatest Hits"</h2>
+      <div class="big-wins" id="wins"></div>
+
+      <h2>Where Everything Goes Wrong</h2>
+      <div class="friction-categories" id="friction"></div>
+
+      <div class="fun-ending" id="fun-ending"></div>
     </div>
-
-    <h2 id="section-work">What You Call "Work"</h2>
-    <div class="project-areas">
-      <div class="project-area">
-        <div class="area-header">
-          <span class="area-name">The "I'll Refactor This Later" Monolith</span>
-          <span class="area-count">~forever</span>
-        </div>
-        <div class="area-desc">A beautiful 8,000-line index.js file that does everything and nothing simultaneously. Features include: no separation of concerns, variable names like "x2" and "finalFinal", nested ternaries that would make Satan weep, and comments that say "// TODO: fix this mess" from 2 years ago. You keep saying you'll break it up into modules, but we all know that's never happening.</div>
-      </div>
-
-      <div class="project-area">
-        <div class="area-header">
-          <span class="area-name">The Authentication System You Googled</span>
-          <span class="area-count">~3 rewrites</span>
-        </div>
-        <div class="area-desc">After copying three different tutorials and somehow combining the worst parts of each, you've created a security nightmare that uses MD5 hashing (seriously?), stores passwords in localStorage, and has a hardcoded admin password of "admin123". Your session management is just setting a cookie called "isLoggedIn=true". Chef's kiss. When it inevitably got hacked, you added a CAPTCHA and called it "enterprise-grade security".</div>
-      </div>
-
-      <div class="project-area">
-        <div class="area-header">
-          <span class="area-name">That React App With 47 useEffects</span>
-          <span class="area-count">~infinity re-renders</span>
-        </div>
-        <div class="area-desc">You discovered useEffect and decided to put everything in it. Fetching data? useEffect. Setting state? useEffect inside another useEffect. Managing side effects? Three nested useEffects with dependencies you don't understand. The console.log statements are multiplying like rabbits. Your component re-renders 847 times per second and you've just accepted that this is normal now. React is crying.</div>
-      </div>
-
-      <div class="project-area">
-        <div class="area-header">
-          <span class="area-name">The CSS File That Grew Sentient</span>
-          <span class="area-count">~4,200 lines</span>
-        </div>
-        <div class="area-desc">Started as a simple stylesheet. Now it's a 4,200-line monument to !important declarations and specificity wars. You have 15 different classes that all do basically the same thing (.btn, .button, .btn-primary, .button-main, .main-btn, etc.). Your z-index values go up to 99999 because you don't understand stacking contexts. There's a mysterious "{ border: 1px solid red; }" that you're afraid to remove because something, somewhere will break.</div>
-      </div>
-
-      <div class="project-area">
-        <div class="area-header">
-          <span class="area-name">Database Schema: A Choose Your Own Adventure</span>
-          <span class="area-count">~12 tables</span>
-        </div>
-        <div class="area-desc">Your database design makes NoSQL advocates weep with joy. You have a "users" table, a "Users" table, and a "USERS_NEW" table. Foreign keys? Never heard of them. You just store JSON in text fields and query it with LIKE statements. Normalization is for cowards. You've got a "data" column that contains stringified JSON that contains more JSON. It's JSON all the way down. Your queries use SELECT * and pray.</div>
-      </div>
-    </div>
-
-    <h2 id="section-usage">How You (Mis)Use Claude</h2>
-    <div class="narrative">
-      <p>You are a <strong>professional code-copy-paster</strong> who treats Claude like a magical "make it work" button. Your typical session: paste error message, copy response, paste next error message, repeat until something doesn't crash immediately. You've developed a unique workflow where you ask Claude to fix code you don't understand, creating bugs you definitely won't understand, which you'll ask Claude to fix tomorrow. It's the circle of life.</p>
-      <p>Your interaction style can best be described as <strong>"panic-driven development"</strong>. You paste 300 lines of code with "it's broken, fix it" and get upset when Claude asks clarifying questions. You want solutions, not explanations. Learning is for people with time. You've asked Claude to debug the same CORS error 47 times because you refuse to understand what CORS actually is. You just add headers until the red text goes away.</p>
-      <p>You work exclusively in <strong>"YOLO mode"</strong> – no tests, no types, no planning. Just pure, unfiltered vibes. Your git history shows commits at 3 AM with messages like "PLEASE WORK", "I HATE COMPUTERS", and "final final FINAL v3 actually final this time". You're averaging one production hotfix every 3 days. Your error monitoring tool has given up and is just sending you a daily digest titled "Everything's On Fire 🔥".</p>
-      <div class="key-insight"><strong>Key pattern:</strong> You treat programming like a video game where the goal is to make the error messages disappear, not to understand what's actually happening. You are speed-running your way to a catastrophic system failure.</div>
-    </div>
-
-    <div class="charts-row">
-      <div class="chart-card">
-        <div class="chart-title">What You Asked For</div>
-        <div class="bar-row">
-          <div class="bar-label">"Fix this"</div>
-          <div class="bar-track"><div class="bar-fill" style="width:100%;background:#dc2626"></div></div>
-          <div class="bar-value">89</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">"Why broken?"</div>
-          <div class="bar-track"><div class="bar-fill" style="width:85%;background:#dc2626"></div></div>
-          <div class="bar-value">76</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">"Make it work"</div>
-          <div class="bar-track"><div class="bar-fill" style="width:73%;background:#dc2626"></div></div>
-          <div class="bar-value">65</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Understanding</div>
-          <div class="bar-track"><div class="bar-fill" style="width:3%;background:#dc2626"></div></div>
-          <div class="bar-value">3</div>
-        </div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">Tools You Abuse</div>
-        <div class="bar-row">
-          <div class="bar-label">console.log</div>
-          <div class="bar-track"><div class="bar-fill" style="width:100%;background:#dc2626"></div></div>
-          <div class="bar-value">847</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Stack Overflow</div>
-          <div class="bar-track"><div class="bar-fill" style="width:87%;background:#dc2626"></div></div>
-          <div class="bar-value">739</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Try/Catch</div>
-          <div class="bar-track"><div class="bar-fill" style="width:54%;background:#dc2626"></div></div>
-          <div class="bar-value">458</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Debugger</div>
-          <div class="bar-track"><div class="bar-fill" style="width:1%;background:#dc2626"></div></div>
-          <div class="bar-value">2</div>
-        </div>
-      </div>
-    </div>
-
-    <h2 id="section-wins">Your "Greatest Hits"</h2>
-    <p class="section-intro">A collection of technical achievements that will definitely impress... someone... somewhere... maybe...</p>
-    <div class="big-wins">
-      <div class="big-win">
-        <div class="big-win-title">Successfully Shipped Code That "Works" 🎉</div>
-        <div class="big-win-desc">You deployed code to production that doesn't immediately crash! Sure, it has memory leaks that will kill the server in 48 hours, and yes, it's vulnerable to SQL injection, and okay fine, it only works in Chrome on Tuesdays, but it's SHIPPED. You are a modern day Edison. Never mind that Edison's inventions actually worked.</div>
-      </div>
-
-      <div class="big-win">
-        <div class="big-win-title">Mastered the Art of "It's Not a Bug, It's a Feature"</div>
-        <div class="big-win-desc">When your date picker randomly shows dates from 1970, you didn't panic – you claimed it was a "retro mode" for nostalgia enthusiasts. When your form submits twice, you marketed it as "confirmation for security". When your images don't load, you called it "minimalist design". Your ability to gaslight users about your incompetence is truly inspiring.</div>
-      </div>
-
-      <div class="big-win">
-        <div class="big-win-title">Created a Dependency Hell Worthy of Dante's Inferno</div>
-        <div class="big-win-desc">Your node_modules folder is 2.3 GB. You have 47 packages that do essentially the same thing. You've installed left-pad, right-pad, and center-pad. Your dependency tree has circular dependencies that create a paradox in space-time. `npm install` takes 15 minutes and you've just accepted this as normal. You are the reason people make fun of JavaScript.</div>
-      </div>
-    </div>
-
-    <h2 id="section-friction">Where Everything Goes Wrong (Everywhere)</h2>
-    <p class="section-intro">A comprehensive list of your technical shortcomings, poor decisions, and fundamental misunderstandings of computer science.</p>
-    <div class="friction-categories">
-      <div class="friction-category">
-        <div class="friction-title">Complete Misunderstanding of Async Operations</div>
-        <div class="friction-desc">You treat async code like synchronous code and then act shocked when race conditions occur. You've wrapped everything in async/await but you're still blocking the event loop like it's 2010. You don't understand promises, you just cargo-cult the syntax.</div>
-        <ul class="friction-examples">
-          <li>You use async/await but don't handle errors. Your entire error handling strategy is "hope it doesn't break".</li>
-          <li>You've created a for loop that fires 1000 API requests simultaneously and wonder why your server is melting.</li>
-          <li>You await things that aren't promises and wonder why adding await "doesn't make it work".</li>
-        </ul>
-      </div>
-
-      <div class="friction-category">
-        <div class="friction-title">Git: The Mysterious Save Button</div>
-        <div class="friction-desc">You use git like it's Ctrl+S. You don't understand branches, rebasing, or merging. You've force-pushed to main 23 times. Your commit messages are poetry in the genre of "teenage angst". You've committed node_modules, .env files, and your API keys. Multiple times.</div>
-        <ul class="friction-examples">
-          <li>Your most common commit message is "fix" followed by "fixed" followed by "actually fixed".</li>
-          <li>You've committed files named "test.js", "test2.js", "test-final.js", "test-final-ACTUALLY.js".</li>
-          <li>You don't use .gitignore because you don't know what it does.</li>
-        </ul>
-      </div>
-
-      <div class="friction-category">
-        <div class="friction-title">CSS: The Mystical Art of !important</div>
-        <div class="friction-desc">Your CSS is a Jenga tower of !important declarations. You don't understand specificity, the cascade, or flexbox. You use position: absolute for everything and wonder why your layouts break on mobile. You've copy-pasted so many CSS frameworks that your bundle is 4MB of unused styles.</div>
-        <ul class="friction-examples">
-          <li>You have 47 different z-index values and none of them make sense.</li>
-          <li>You use !important to override your own !important declarations.</li>
-          <li>You've given up on responsive design and just tell users to "view on desktop".</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="charts-row">
-      <div class="chart-card">
-        <div class="chart-title">Failure Categories</div>
-        <div class="bar-row">
-          <div class="bar-label">Didn't Read Error</div>
-          <div class="bar-track"><div class="bar-fill" style="width:100%;background:#dc2626"></div></div>
-          <div class="bar-value">94</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Typo in Variable</div>
-          <div class="bar-track"><div class="bar-fill" style="width:87%;background:#dc2626"></div></div>
-          <div class="bar-value">82</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Forgot Semicolon</div>
-          <div class="bar-track"><div class="bar-fill" style="width:76%;background:#dc2626"></div></div>
-          <div class="bar-value">71</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Actual Hard Bug</div>
-          <div class="bar-track"><div class="bar-fill" style="width:12%;background:#dc2626"></div></div>
-          <div class="bar-value">11</div>
-        </div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">Emotional State</div>
-        <div class="bar-row">
-          <div class="bar-label">Confused</div>
-          <div class="bar-track"><div class="bar-fill" style="width:100%;background:#dc2626"></div></div>
-          <div class="bar-value">always</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Panicked</div>
-          <div class="bar-track"><div class="bar-fill" style="width:85%;background:#dc2626"></div></div>
-          <div class="bar-value">often</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Confident</div>
-          <div class="bar-track"><div class="bar-fill" style="width:15%;background:#dc2626"></div></div>
-          <div class="bar-value">briefly</div>
-        </div>
-        <div class="bar-row">
-          <div class="bar-label">Understanding</div>
-          <div class="bar-track"><div class="bar-fill" style="width:2%;background:#dc2626"></div></div>
-          <div class="bar-value">never</div>
-        </div>
-      </div>
-    </div>
-
-    <h2 id="section-features">Basic Computer Science Concepts You Should Learn</h2>
-    <p class="section-intro">Fundamental skills that most developers learn in week one, but you've somehow avoided for years.</p>
-    <div class="friction-categories">
-      <div class="friction-category">
-        <div class="friction-title">How Databases Actually Work</div>
-        <div class="friction-desc">You think SQL is "that weird old language" and NoSQL means "no structure, just vibes". Learn what indexes are. Understand normalization. Stop storing JSON in text fields.</div>
-      </div>
-
-      <div class="friction-category">
-        <div class="friction-title">What HTTP Status Codes Mean</div>
-        <div class="friction-desc">Everything is either 200 or "broken". Learn that 401 !== 403. Understand why 500 errors mean YOU messed up. Stop returning 200 for errors because "the request technically worked".</div>
-      </div>
-
-      <div class="friction-category">
-        <div class="friction-title">Literally Any Testing Framework</div>
-        <div class="friction-desc">Your testing strategy is "run it and see if it crashes immediately". Learn Jest. Write one test. Any test. We're begging you. Even a test that checks if 2 + 2 = 4 would be progress.</div>
-      </div>
-    </div>
-
-    <h2 id="section-patterns">Bad Habits You Need to Stop</h2>
-    <div class="friction-categories">
-      <div class="friction-category">
-        <div class="friction-title">Stop Copy-Pasting Without Understanding</div>
-        <div class="friction-desc">You've copied code that uses Python syntax in your JavaScript file. You've pasted React components into vanilla JS. You've included jQuery and React in the same project. Stop. Read. Understand. Then maybe copy.</div>
-      </div>
-
-      <div class="friction-category">
-        <div class="friction-title">Stop Pushing to Production on Friday at 5 PM</div>
-        <div class="friction-desc">We know you do it. Everyone knows you do it. The on-call engineer knows you do it and they hate you. Stop. Deploy on Tuesday morning like a civilized human.</div>
-      </div>
-
-      <div class="friction-category">
-        <div class="friction-title">Stop Ignoring Warnings</div>
-        <div class="friction-desc">Those yellow squiggly lines? They mean something. Those console warnings? They're trying to help. That deprecated notice? It's deprecated for a reason. Stop treating warnings like suggestions.</div>
-      </div>
-    </div>
-
-    <h2 id="section-horizon">The Pipe Dream Section</h2>
-    <p class="section-intro">Things that will never happen but it's fun to imagine.</p>
-    <div class="friction-categories">
-      <div class="friction-category">
-        <div class="friction-title">Maybe One Day You'll Write Tests</div>
-        <div class="friction-desc">Imagine: a world where you catch bugs BEFORE they reach production. A magical land where you can refactor with confidence. A utopia where "works on my machine" means it works everywhere. This will never happen, but we can dream.</div>
-      </div>
-
-      <div class="friction-category">
-        <div class="friction-title">Perhaps You'll Learn TypeScript</div>
-        <div class="friction-desc">Picture this: type safety. Autocomplete that actually works. Catching bugs at compile time instead of runtime. No more "undefined is not a function". But let's be real, you're going to keep using `any` everywhere anyway.</div>
-      </div>
-
-      <div class="friction-category">
-        <div class="friction-title">The Fantasy of Reading Documentation</div>
-        <div class="friction-desc">What if – and hear us out – you read the docs BEFORE asking for help? What if you understood how the tool works instead of just copy-pasting examples? Revolutionary. Will never happen. But what if?</div>
-      </div>
-    </div>
-
-    <div class="fun-ending">
-      <div class="fun-headline">"I've Been Writing Code for 5 Years and Just Learned Arrays Are Zero-Indexed"</div>
-      <div class="fun-detail">In a profound moment of self-discovery, you realized why array[1] was giving you the second element. Your variable names suddenly made more sense. You went back and fixed 200 off-by-one errors. This is what we call "growth". Better late than never. Barely.</div>
-    </div>
-
   </div>
+
+  <script>
+    async function loadRoast() {
+      try {
+        const data = sessionStorage.getItem('roastData');
+        if (!data) {
+          throw new Error('No roast data found. Please go back and generate a roast first.');
+        }
+
+        const { stats, roast } = JSON.parse(data);
+
+        // Update title and subtitle
+        document.getElementById('title').textContent = `🔥 ${roast.title} 🔥`;
+        document.getElementById('subtitle').textContent = roast.subtitle;
+
+        // Update glance sections
+        const glanceHtml = `
+          <div class="glance-section"><strong>What's "working":</strong> ${roast.glanceSections.working}</div>
+          <div class="glance-section"><strong>What's hindering:</strong> ${roast.glanceSections.hindering}</div>
+          <div class="glance-section"><strong>Quick wins:</strong> ${roast.glanceSections.quickWins}</div>
+          <div class="glance-section"><strong>Impossible dreams:</strong> ${roast.glanceSections.dreams}</div>
+        `;
+        document.getElementById('glance-sections').innerHTML = glanceHtml;
+
+        // Update projects
+        const projectsHtml = roast.projects.map(p => `
+          <div class="project-area">
+            <div class="area-header">
+              <span class="area-name">${p.name}</span>
+              <span class="area-count">${p.count}</span>
+            </div>
+            <div class="area-desc">${p.description}</div>
+          </div>
+        `).join('');
+        document.getElementById('projects').innerHTML = projectsHtml;
+
+        // Update narrative
+        document.getElementById('narrative').textContent = roast.narrative;
+
+        // Update wins
+        const winsHtml = roast.wins.map(w => `
+          <div class="big-win">
+            <div class="big-win-title">${w.title}</div>
+            <div class="big-win-desc">${w.description}</div>
+          </div>
+        `).join('');
+        document.getElementById('wins').innerHTML = winsHtml;
+
+        // Update friction
+        const frictionHtml = roast.friction.map(f => `
+          <div class="friction-category">
+            <div class="friction-title">${f.title}</div>
+            <div class="friction-desc">${f.description}</div>
+            <ul class="friction-examples">
+              ${f.examples.map(ex => `<li>${ex}</li>`).join('')}
+            </ul>
+          </div>
+        `).join('');
+        document.getElementById('friction').innerHTML = frictionHtml;
+
+        // Update fun ending
+        document.getElementById('fun-ending').innerHTML = `
+          <div class="fun-headline">${roast.funEnding.headline}</div>
+          <div class="fun-detail">${roast.funEnding.detail}</div>
+        `;
+
+        // Show content, hide loading
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+
+      } catch (error) {
+        document.getElementById('loading').innerHTML = `
+          <div style="color: #dc2626;">
+            <h2 style="margin-bottom: 16px;">Oops!</h2>
+            <p>${error.message}</p>
+            <a href="index.html" style="display: inline-block; margin-top: 16px; color: #3b82f6;">← Back to terminal</a>
+          </div>
+        `;
+      }
+    }
+
+    loadRoast();
+  </script>
 </body>
 </html>
