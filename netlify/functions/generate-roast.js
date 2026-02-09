@@ -1,24 +1,54 @@
-// Vercel Serverless Function to generate personalized roasts
-export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
-
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+// Netlify Serverless Function to generate personalized roasts
+exports.handler = async (event, context) => {
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      },
+      body: ''
+    };
   }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ error: 'Method not allowed' })
+    };
   }
 
-  const { username } = req.body;
+  let body;
+  try {
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ error: 'Invalid JSON' })
+    };
+  }
+
+  const { username } = body;
 
   if (!username) {
-    return res.status(400).json({ error: 'GitHub username is required' });
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ error: 'GitHub username is required' })
+    };
   }
 
   try {
@@ -38,7 +68,6 @@ export default async function handler(req, res) {
     let totalStars = 0;
     let totalForks = 0;
     let hasReadme = 0;
-    let hasTests = 0;
     let oldRepos = 0;
     const repoNames = [];
 
@@ -51,12 +80,10 @@ export default async function handler(req, res) {
         languages[repo.language] = (languages[repo.language] || 0) + 1;
       }
 
-      // Check for README
       if (repo.has_pages || repo.description) {
         hasReadme++;
       }
 
-      // Check if repo is old (no updates in 2+ years)
       const lastUpdate = new Date(repo.updated_at);
       const twoYearsAgo = new Date();
       twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
@@ -73,7 +100,6 @@ export default async function handler(req, res) {
     const events = await eventsResponse.json();
     const commitEvents = events.filter(e => e.type === 'PushEvent');
 
-    // Analyze commit messages
     const commitMessages = [];
     for (const event of commitEvents.slice(0, 30)) {
       if (event.payload && event.payload.commits) {
@@ -81,7 +107,6 @@ export default async function handler(req, res) {
       }
     }
 
-    // Calculate stats
     const avgCommitMessageLength = commitMessages.length > 0
       ? Math.round(commitMessages.reduce((sum, msg) => sum + msg.length, 0) / commitMessages.length)
       : 0;
@@ -104,7 +129,6 @@ export default async function handler(req, res) {
       totalStars,
       totalForks,
       hasReadme,
-      hasTests,
       oldRepos,
       avgCommitMessageLength,
       oneWordCommits,
@@ -119,7 +143,7 @@ export default async function handler(req, res) {
       throw new Error('GROQ_API_KEY not configured');
     }
 
-    const prompt = `You are a brutally honest but funny code reviewer. Generate a hilarious roast report for this GitHub user. Use the exact HTML structure format provided below, but fill it with custom roasts based on their actual GitHub data.
+    const prompt = `You are a brutally honest but funny code reviewer. Generate a hilarious roast report for this GitHub user based on their actual GitHub data.
 
 GitHub User: ${stats.username}
 Name: ${stats.name}
@@ -137,39 +161,30 @@ Has typos in commits: ${hasTypos ? 'Yes' : 'No'}
 Recent commit messages analyzed: ${stats.totalCommitMessages}
 Sample repo names: ${stats.repoNames.join(', ')}
 
-Generate a roast report that:
-1. Roasts their choice of ${stats.topLanguage} as their main language
-2. Makes fun of their commit message quality (especially if they're short or have typos)
-3. Jokes about their follower/following ratio
-4. Roasts their repo naming conventions
-5. Makes fun of abandoned repos if they have any
-6. Jokes about their star count
-7. Roasts specific patterns you notice in their data
+Be SAVAGE but FUNNY. Roast their language choice, commit messages, follower ratio, repo names, abandoned repos, and star count. Use internet humor and programming memes!
 
-Be SAVAGE but FUNNY. Use internet humor, programming memes, and clever observations. Don't hold back!
-
-Return ONLY valid JSON in this exact format (no markdown, no code blocks, just raw JSON):
+Return ONLY valid JSON (no markdown, no code blocks):
 {
   "title": "A one-line savage title",
   "subtitle": "A funny subtitle with their stats",
   "glanceSections": {
-    "working": "What's somehow working (2-3 sentences, be funny but acknowledge something positive)",
-    "hindering": "What's hilariously bad (2-3 sentences, savage roast)",
+    "working": "What's somehow working (2-3 sentences)",
+    "hindering": "What's hilariously bad (2-3 sentences)",
     "quickWins": "Quick fix suggestions (2-3 sentences, sarcastic)",
-    "dreams": "Impossible dreams (2-3 sentences, funny fantasy scenarios)"
+    "dreams": "Impossible dreams (2-3 sentences)"
   },
   "projects": [
     {
-      "name": "Roast category name (e.g., 'The Abandoned Graveyard')",
+      "name": "Category name",
       "count": "~X repos",
-      "description": "2-3 sentence roast about this category of their work"
+      "description": "2-3 sentence roast"
     }
   ],
-  "narrative": "A longer 3-paragraph roast narrative analyzing their entire GitHub presence, coding style, and developer persona. Be detailed and savage.",
+  "narrative": "A 3-paragraph roast analyzing their entire GitHub presence",
   "wins": [
     {
-      "title": "Sarcastic achievement title",
-      "description": "2-3 sentence sarcastic description"
+      "title": "Sarcastic achievement",
+      "description": "2-3 sentences"
     }
   ],
   "friction": [
@@ -180,8 +195,8 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just r
     }
   ],
   "funEnding": {
-    "headline": "A hilarious one-liner observation",
-    "detail": "2-3 sentences expanding on the joke"
+    "headline": "A hilarious one-liner",
+    "detail": "2-3 sentences"
   }
 }`;
 
@@ -196,7 +211,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just r
         messages: [
           {
             role: 'system',
-            content: 'You are a hilarious and brutally honest code reviewer who generates savage but funny roasts. Always return valid JSON only, no markdown formatting.'
+            content: 'You are a hilarious code reviewer who generates savage but funny roasts. Always return valid JSON only.'
           },
           {
             role: 'user',
@@ -215,20 +230,31 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks, just r
 
     const groqData = await groqResponse.json();
     let roastContent = groqData.choices[0].message.content.trim();
-
-    // Remove markdown code blocks if present
     roastContent = roastContent.replace(/```json\n?/g, '').replace(/```\n?/g, '');
 
     const roast = JSON.parse(roastContent);
 
-    // Return combined data
-    res.status(200).json({
-      stats,
-      roast
-    });
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        stats,
+        roast
+      })
+    };
 
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: error.message });
+    return {
+      statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ error: error.message })
+    };
   }
-}
+};
