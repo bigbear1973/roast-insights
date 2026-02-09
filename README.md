@@ -4,7 +4,7 @@ A hilarious AI-powered tool that analyzes your GitHub profile and generates a sa
 
 ## Features
 
-- 🎨 **Claude Code Terminal UI** - Looks just like the real thing
+- 🎨 **Baude Code Terminal UI** - Beautiful terminal interface
 - 🤖 **AI-Powered Roasts** - Uses Groq's Llama 3.3 70B model for creative, personalized roasts
 - 📊 **Real GitHub Analysis** - Fetches your actual repos, commit messages, languages, and more
 - 🎭 **Fully Customized Reports** - Every roast is unique based on your GitHub data
@@ -105,7 +105,7 @@ MIT - Feel free to roast your friends!
 
 ## Credits
 
-Built with Claude Code 🤖
+Built with Baude Code 🤖
 
 ---
 
