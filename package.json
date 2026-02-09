@@ -1,0 +1,11 @@
+{
+  "name": "baude-code-roast-generator",
+  "version": "1.0.0",
+  "description": "AI-powered GitHub roast generator",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "keywords": ["github", "roast", "ai", "groq"],
+  "license": "MIT"
+}
