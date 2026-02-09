@@ -53,14 +53,27 @@ exports.handler = async (event, context) => {
 
   try {
     // Fetch GitHub user data
-    const userResponse = await fetch(`https://api.github.com/users/${username}`);
+    const userResponse = await fetch(`https://api.github.com/users/${username}`, {
+      headers: {
+        'User-Agent': 'Baude-Code-Roaster',
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
     if (!userResponse.ok) {
-      throw new Error('GitHub user not found');
+      const errorData = await userResponse.json().catch(() => ({}));
+      const errorMsg = errorData.message || `GitHub API returned status ${userResponse.status}`;
+      throw new Error(errorMsg);
     }
     const userData = await userResponse.json();
 
     // Fetch user repos
-    const reposResponse = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&sort=updated`);
+    const reposResponse = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&sort=updated`, {
+      headers: {
+        'User-Agent': 'Baude-Code-Roaster',
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
     const repos = await reposResponse.json();
 
     // Analyze repos
@@ -96,7 +109,12 @@ exports.handler = async (event, context) => {
     const languageCount = Object.keys(languages).length;
 
     // Fetch recent commits
-    const eventsResponse = await fetch(`https://api.github.com/users/${username}/events/public?per_page=100`);
+    const eventsResponse = await fetch(`https://api.github.com/users/${username}/events/public?per_page=100`, {
+      headers: {
+        'User-Agent': 'Baude-Code-Roaster',
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
     const events = await eventsResponse.json();
     const commitEvents = events.filter(e => e.type === 'PushEvent');
 
