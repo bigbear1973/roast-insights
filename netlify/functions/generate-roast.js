@@ -181,7 +181,7 @@ Sample repo names: ${stats.repoNames.join(', ')}
 
 Be SAVAGE but FUNNY. Roast their language choice, commit messages, follower ratio, repo names, abandoned repos, and star count. Use internet humor and programming memes!
 
-Return ONLY valid JSON (no markdown, no code blocks):
+CRITICAL: Return ONLY valid JSON. Escape all quotes in strings. No markdown, no code blocks, no extra text:
 {
   "title": "A one-line savage title",
   "subtitle": "A funny subtitle with their stats",
@@ -229,15 +229,16 @@ Return ONLY valid JSON (no markdown, no code blocks):
         messages: [
           {
             role: 'system',
-            content: 'You are a hilarious code reviewer who generates savage but funny roasts. Always return valid JSON only.'
+            content: 'You are a hilarious code reviewer who generates savage but funny roasts. Always return valid JSON only. Properly escape all quotes and special characters in JSON strings.'
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.9,
-        max_tokens: 4000
+        temperature: 0.8,
+        max_tokens: 4000,
+        response_format: { type: 'json_object' }
       })
     });
 
@@ -248,9 +249,19 @@ Return ONLY valid JSON (no markdown, no code blocks):
 
     const groqData = await groqResponse.json();
     let roastContent = groqData.choices[0].message.content.trim();
-    roastContent = roastContent.replace(/```json\n?/g, '').replace(/```\n?/g, '');
 
-    const roast = JSON.parse(roastContent);
+    // Remove markdown code blocks if present
+    roastContent = roastContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+    // Try to parse the JSON with better error handling
+    let roast;
+    try {
+      roast = JSON.parse(roastContent);
+    } catch (parseError) {
+      // Log the problematic JSON for debugging
+      console.error('Failed to parse Groq response:', roastContent.substring(0, 500));
+      throw new Error(`Failed to parse AI response: ${parseError.message}`);
+    }
 
     return {
       statusCode: 200,
